@@ -47,6 +47,8 @@ class _AddHorseEventScreenState extends State<AddHorseEventScreen> {
     'Other',
   ];
 
+  String _selectedCategory = 'Medical';
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -291,5 +293,98 @@ class _AddHorseEventScreenState extends State<AddHorseEventScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildEventDetails() {
+    return Column(
+      children: [
+        TextFormField(
+          decoration: const InputDecoration(
+            labelText: 'Event Title',
+            prefixIcon: Icon(Icons.title),
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter an event title';
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: 16),
+        DropdownButtonFormField<String>(
+          value: _selectedType,
+          decoration: const InputDecoration(
+            labelText: 'Event Type',
+            prefixIcon: Icon(Icons.category),
+          ),
+          items: _eventTypes.map((type) {
+            return DropdownMenuItem(
+              value: type,
+              child: Text(type),
+            );
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              _selectedType = value!;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateTimeSection() {
+    return Column(
+      children: [
+        ListTile(
+          leading: const Icon(Icons.calendar_today),
+          title: const Text('Date'),
+          subtitle: Text(
+            '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+          ),
+          onTap: _pickDate,
+        ),
+        ListTile(
+          leading: const Icon(Icons.access_time),
+          title: const Text('Time'),
+          subtitle: Text(
+            '${_selectedTime.hour}:${_selectedTime.minute.toString().padLeft(2, '0')}',
+          ),
+          onTap: _pickTime,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNotesSection() {
+    return TextFormField(
+      decoration: const InputDecoration(
+        labelText: 'Notes',
+        prefixIcon: Icon(Icons.note),
+        alignLabelWithHint: true,
+      ),
+      maxLines: 3,
+    );
+  }
+
+  IconData _getCategoryIcon(String category) {
+    switch (category) {
+      case 'Medical':
+        return Icons.medical_services;
+      case 'Training':
+        return Icons.sports;
+      case 'Competition':
+        return Icons.emoji_events;
+      case 'Maintenance':
+        return Icons.build;
+      default:
+        return Icons.event;
+    }
+  }
+
+  void _selectCategory(String category) {
+    setState(() {
+      _selectedCategory = category;
+    });
   }
 } 
