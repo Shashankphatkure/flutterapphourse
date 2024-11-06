@@ -71,9 +71,7 @@ class HorsesScreen extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => HorseDetailsScreen(
-          heroTag: 'horse_card_$index',
-        ),
+        builder: (context) => const HorseDetailsScreen(),
       ),
     );
   }
@@ -94,7 +92,6 @@ class HorsesScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -111,10 +108,8 @@ class HorsesScreen extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: Colors.grey[600],
                 ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 8),
+          const Spacer(),
           _buildNextEventBadge(context),
         ],
       ),
@@ -161,16 +156,12 @@ class HorsesScreen extends StatelessWidget {
             color: Theme.of(context).colorScheme.primary,
           ),
           const SizedBox(width: 4),
-          Flexible(
-            child: Text(
-              'Vet Visit Tomorrow',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.w500,
-                  ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+          Text(
+            'Vet Visit Tomorrow',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.w500,
+                ),
           ),
         ],
       ),
@@ -275,7 +266,7 @@ class HorsesScreen extends StatelessWidget {
 
   Widget _buildEnhancedHorseCard(BuildContext context, int index) {
     return Hero(
-      tag: 'horse_card_$index',
+      tag: 'horse_$index',
       child: Card(
         clipBehavior: Clip.antiAlias,
         elevation: 4,
@@ -291,9 +282,7 @@ class HorsesScreen extends StatelessWidget {
                 children: [
                   _buildHorseImage(context),
                   Expanded(
-                    child: SingleChildScrollView(
-                      child: _buildHorseInfo(context),
-                    ),
+                    child: _buildHorseInfo(context),
                   ),
                 ],
               ),
@@ -322,27 +311,24 @@ class HorsesScreen extends StatelessWidget {
                 ),
           ),
           const SizedBox(height: 16),
-          SizedBox(
-            height: 100,
-            child: Row(
-              children: [
-                _buildEnhancedStatCard(
-                  context,
-                  '6',
-                  'Total Horses',
-                  Icons.pets_rounded,
-                  _gradientColors,
-                ),
-                const SizedBox(width: 16),
-                _buildEnhancedStatCard(
-                  context,
-                  '2',
-                  'Upcoming Events',
-                  Icons.event_note_rounded,
-                  const [Colors.orange, Colors.deepOrange],
-                ),
-              ],
-            ),
+          Row(
+            children: [
+              _buildEnhancedStatCard(
+                context,
+                '6',
+                'Total Horses',
+                Icons.pets_rounded,
+                _gradientColors,
+              ),
+              const SizedBox(width: 16),
+              _buildEnhancedStatCard(
+                context,
+                '2',
+                'Upcoming Events',
+                Icons.event_note_rounded,
+                [Colors.orange, Colors.deepOrange],
+              ),
+            ],
           ),
         ],
       ),
@@ -414,42 +400,39 @@ class HorsesScreen extends StatelessWidget {
                 ),
           ),
           const SizedBox(height: 16),
-          SizedBox(
-            height: 48,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildQuickActionCard(
-                    context,
-                    'Add Event',
-                    Icons.event_available,
-                    Colors.green,
-                    () => _navigateToAddEvent(context),
-                  ),
-                  _buildQuickActionCard(
-                    context,
-                    'Health Check',
-                    Icons.medical_services,
-                    Colors.red,
-                    () => _navigateToHealthCheck(context),
-                  ),
-                  _buildQuickActionCard(
-                    context,
-                    'Training',
-                    Icons.sports,
-                    Colors.purple,
-                    () => _navigateToTraining(context),
-                  ),
-                  _buildQuickActionCard(
-                    context,
-                    'Documents',
-                    Icons.description,
-                    Colors.blue,
-                    () => _navigateToDocuments(context),
-                  ),
-                ],
-              ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildQuickActionCard(
+                  context,
+                  'Add Event',
+                  Icons.event_available,
+                  Colors.green,
+                  () => _navigateToAddEvent(context),
+                ),
+                _buildQuickActionCard(
+                  context,
+                  'Health Check',
+                  Icons.medical_services,
+                  Colors.red,
+                  () => _navigateToHealthCheck(context),
+                ),
+                _buildQuickActionCard(
+                  context,
+                  'Training',
+                  Icons.sports,
+                  Colors.purple,
+                  () => _navigateToTraining(context),
+                ),
+                _buildQuickActionCard(
+                  context,
+                  'Documents',
+                  Icons.description,
+                  Colors.blue,
+                  () => _navigateToDocuments(context),
+                ),
+              ],
             ),
           ),
         ],
