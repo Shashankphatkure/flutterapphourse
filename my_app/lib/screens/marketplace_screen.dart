@@ -107,6 +107,7 @@ class MarketplaceScreen extends StatelessWidget {
             itemCount: categories.length,
             itemBuilder: (context, index) {
               final category = categories[index];
+              final count = category['count'] as String;
               return Container(
                 width: 100,
                 margin: const EdgeInsets.only(right: 12),
@@ -139,9 +140,9 @@ class MarketplaceScreen extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    if (category['count']!.isNotEmpty)
+                    if (count.isNotEmpty)
                       Text(
-                        '${category['count']} items',
+                        '$count items',
                         style: TextStyle(
                           color: Colors.grey[600],
                           fontSize: 12,

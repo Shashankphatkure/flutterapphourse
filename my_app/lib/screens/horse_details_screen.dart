@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'add_horse_event_screen.dart';
+import 'edit_horse_screen.dart';
 
 class HorseDetailsScreen extends StatelessWidget {
   const HorseDetailsScreen({super.key});
@@ -20,9 +21,12 @@ class HorseDetailsScreen extends StatelessWidget {
                   background: Stack(
                     fit: StackFit.expand,
                     children: [
-                      Image.network(
-                        'https://picsum.photos/800/600',
-                        fit: BoxFit.cover,
+                      Hero(
+                        tag: 'horse_image',
+                        child: Image.network(
+                          'https://picsum.photos/800/600',
+                          fit: BoxFit.cover,
+                        ),
                       ),
                       Container(
                         decoration: BoxDecoration(
@@ -42,39 +46,28 @@ class HorseDetailsScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: const Text(
-                                'HEALTHY',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
+                            _buildStatusBadge(context),
                             const SizedBox(height: 8),
                             const Text(
                               'Thunder',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 28,
+                                fontSize: 32,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const Text(
-                              'Arabian • 8 years old',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 16,
-                              ),
+                            Row(
+                              children: [
+                                const Text(
+                                  'Arabian • 8 years old',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                _buildVerifiedBadge(),
+                              ],
                             ),
                           ],
                         ),
@@ -82,37 +75,45 @@ class HorseDetailsScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                bottom: const TabBar(
-                  tabs: [
-                    Tab(
-                      icon: Icon(Icons.info_outline),
-                      text: 'Info',
-                    ),
-                    Tab(
-                      icon: Icon(Icons.medical_services_outlined),
-                      text: 'Health',
-                    ),
-                    Tab(
-                      icon: Icon(Icons.event_note_outlined),
-                      text: 'Training',
-                    ),
-                    Tab(
-                      icon: Icon(Icons.contact_phone_outlined),
-                      text: 'Contacts',
-                    ),
+                bottom: TabBar(
+                  tabs: const [
+                    Tab(icon: Icon(Icons.info_outline), text: 'Info'),
+                    Tab(icon: Icon(Icons.medical_services_outlined), text: 'Health'),
+                    Tab(icon: Icon(Icons.event_note_outlined), text: 'Training'),
+                    Tab(icon: Icon(Icons.contact_phone_outlined), text: 'Contacts'),
                   ],
+                  indicatorColor: Theme.of(context).colorScheme.primary,
+                  labelColor: Theme.of(context).colorScheme.primary,
                 ),
                 actions: [
                   IconButton(
                     icon: const Icon(Icons.edit),
                     onPressed: () {
-                      // TODO: Navigate to edit screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const EditHorseScreen(isEditing: true),
+                        ),
+                      );
                     },
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.more_vert),
-                    onPressed: () {
-                      // TODO: Show more options
+                  PopupMenuButton(
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'share',
+                        child: Text('Share Profile'),
+                      ),
+                      const PopupMenuItem(
+                        value: 'export',
+                        child: Text('Export Data'),
+                      ),
+                      const PopupMenuItem(
+                        value: 'delete',
+                        child: Text('Delete Horse'),
+                      ),
+                    ],
+                    onSelected: (value) {
+                      // Handle menu selection
                     },
                   ),
                 ],
@@ -141,7 +142,55 @@ class HorseDetailsScreen extends StatelessWidget {
           },
           label: const Text('Add Event'),
           icon: const Icon(Icons.add),
+          backgroundColor: Theme.of(context).colorScheme.primary,
         ),
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 6,
+      ),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.favorite,
+            color: Colors.white,
+            size: 16,
+          ),
+          SizedBox(width: 4),
+          Text(
+            'HEALTHY',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVerifiedBadge() {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Colors.blue,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Icon(
+        Icons.verified,
+        color: Colors.white,
+        size: 16,
       ),
     );
   }

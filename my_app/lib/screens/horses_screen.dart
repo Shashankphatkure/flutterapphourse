@@ -4,6 +4,11 @@ import 'edit_horse_screen.dart';
 import 'calendar_screen.dart';
 
 class HorsesScreen extends StatelessWidget {
+  final List<Color> _gradientColors = [
+    const Color(0xFF1E88E5),
+    const Color(0xFF1565C0),
+  ];
+
   const HorsesScreen({super.key});
 
   @override
@@ -11,27 +16,59 @@ class HorsesScreen extends StatelessWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.medium(
+          SliverAppBar.large(
+            expandedHeight: 200,
+            floating: false,
+            pinned: true,
+            stretch: true,
             title: const Text('My Horses'),
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: _gradientColors,
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      right: -50,
+                      bottom: -50,
+                      child: Opacity(
+                        opacity: 0.1,
+                        child: Icon(
+                          Icons.pets,
+                          size: 200,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             actions: [
               IconButton(
                 icon: const Icon(Icons.calendar_today),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const CalendarScreen(),
-                    ),
-                  );
-                },
+                onPressed: () => _navigateToCalendar(context),
               ),
               IconButton(
                 icon: const Icon(Icons.search),
-                onPressed: () {
-                  // TODO: Implement search
-                },
+                onPressed: () => _showSearch(context),
+              ),
+              IconButton(
+                icon: const Icon(Icons.filter_list),
+                onPressed: () => _showFilterOptions(context),
               ),
             ],
+          ),
+          SliverToBoxAdapter(
+            child: _buildStatisticsSection(context),
+          ),
+          SliverToBoxAdapter(
+            child: _buildQuickActions(context),
           ),
           SliverPadding(
             padding: const EdgeInsets.all(16),
@@ -43,161 +80,264 @@ class HorsesScreen extends StatelessWidget {
                 mainAxisSpacing: 16,
               ),
               delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const HorseDetailsScreen(),
-                        ),
-                      );
-                    },
-                    child: Card(
-                      clipBehavior: Clip.antiAlias,
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Stack(
-                            children: [
-                              Container(
-                                height: 140,
-                                decoration: BoxDecoration(
-                                  image: const DecorationImage(
-                                    image: NetworkImage('https://picsum.photos/200'),
-                                    fit: BoxFit.cover,
-                                  ),
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      Colors.transparent,
-                                      Colors.black.withOpacity(0.7),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top: 8,
-                                right: 8,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.primary,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: const Text(
-                                    '8 yrs',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 8,
-                                right: 8,
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.green,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: const Icon(
-                                    Icons.check_circle,
-                                    color: Colors.white,
-                                    size: 16,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Thunder',
-                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Arabian Stallion',
-                                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).colorScheme.primaryContainer,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          Icons.event_available,
-                                          size: 16,
-                                          color: Theme.of(context).colorScheme.primary,
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          'Vet Visit Tomorrow',
-                                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                            color: Theme.of(context).colorScheme.primary,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+                (context, index) => _buildEnhancedHorseCard(context, index),
                 childCount: 6,
               ),
             ),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const EditHorseScreen(),
-            ),
-          );
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Add Horse'),
+      floatingActionButton: _buildAnimatedFAB(context),
+    );
+  }
+
+  Widget _buildStatisticsSection(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Statistics',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              _buildEnhancedStatCard(
+                context,
+                '6',
+                'Total Horses',
+                Icons.pets_rounded,
+                _gradientColors,
+              ),
+              const SizedBox(width: 16),
+              _buildEnhancedStatCard(
+                context,
+                '2',
+                'Upcoming Events',
+                Icons.event_note_rounded,
+                [Colors.orange, Colors.deepOrange],
+              ),
+            ],
+          ),
+        ],
       ),
     );
+  }
+
+  Widget _buildQuickActions(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Quick Actions',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          const SizedBox(height: 16),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildQuickActionCard(
+                  context,
+                  'Add Event',
+                  Icons.event_available,
+                  Colors.green,
+                  () => _navigateToAddEvent(context),
+                ),
+                _buildQuickActionCard(
+                  context,
+                  'Health Check',
+                  Icons.medical_services,
+                  Colors.red,
+                  () => _navigateToHealthCheck(context),
+                ),
+                _buildQuickActionCard(
+                  context,
+                  'Training',
+                  Icons.sports,
+                  Colors.purple,
+                  () => _navigateToTraining(context),
+                ),
+                _buildQuickActionCard(
+                  context,
+                  'Documents',
+                  Icons.description,
+                  Colors.blue,
+                  () => _navigateToDocuments(context),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActionCard(
+    BuildContext context,
+    String title,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.only(right: 16, bottom: 16),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 12,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: color),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEnhancedStatCard(
+    BuildContext context,
+    String value,
+    String label,
+    IconData icon,
+    List<Color> gradientColors,
+  ) {
+    return Expanded(
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: gradientColors,
+            ),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            children: [
+              Icon(
+                icon,
+                size: 32,
+                color: Colors.white,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                value,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+              ),
+              Text(
+                label,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Colors.white.withOpacity(0.8),
+                    ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEnhancedHorseCard(BuildContext context, int index) {
+    return Hero(
+      tag: 'horse_$index',
+      child: Card(
+        clipBehavior: Clip.antiAlias,
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: InkWell(
+          onTap: () => _navigateToHorseDetails(context, index),
+          child: Stack(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHorseImage(context),
+                  Expanded(
+                    child: _buildHorseInfo(context),
+                  ),
+                ],
+              ),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: _buildHorseStatus(context),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Add more helper methods and UI components...
+}
+
+class HorseSearchDelegate extends SearchDelegate {
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      ),
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, null);
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    // Implement search results
+    return Container();
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    // Implement search suggestions
+    return Container();
   }
 } 

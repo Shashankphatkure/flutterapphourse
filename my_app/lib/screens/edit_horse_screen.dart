@@ -93,6 +93,7 @@ class _EditHorseScreenState extends State<EditHorseScreen> {
       children: [
         Container(
           height: 200,
+          width: double.infinity,
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surfaceVariant,
             borderRadius: BorderRadius.circular(12),
@@ -105,14 +106,24 @@ class _EditHorseScreenState extends State<EditHorseScreen> {
         Positioned(
           bottom: 16,
           right: 16,
-          child: CircleAvatar(
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            child: IconButton(
-              icon: const Icon(Icons.camera_alt, color: Colors.white),
-              onPressed: () {
-                // TODO: Implement image picker
-              },
-            ),
+          child: Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                child: IconButton(
+                  icon: const Icon(Icons.camera_alt, color: Colors.white),
+                  onPressed: _pickImage,
+                ),
+              ),
+              const SizedBox(width: 8),
+              CircleAvatar(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                child: IconButton(
+                  icon: const Icon(Icons.photo_library, color: Colors.white),
+                  onPressed: _pickImage,
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -314,25 +325,7 @@ class _EditHorseScreenState extends State<EditHorseScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              Wrap(
-                spacing: 8,
-                children: _availableDisciplines.map((discipline) {
-                  final isSelected = _disciplines.contains(discipline);
-                  return FilterChip(
-                    label: Text(discipline),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      setState(() {
-                        if (selected) {
-                          _disciplines.add(discipline);
-                        } else {
-                          _disciplines.remove(discipline);
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
+              _buildDisciplineSelector(),
             ],
           ],
         ),
@@ -387,6 +380,36 @@ class _EditHorseScreenState extends State<EditHorseScreen> {
         _birthDate = picked;
       });
     }
+  }
+
+  Future<void> _pickImage() async {
+    // TODO: Implement image picker
+    // Use image_picker package
+  }
+
+  Widget _buildDisciplineSelector() {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: _availableDisciplines.map((discipline) {
+        final isSelected = _disciplines.contains(discipline);
+        return FilterChip(
+          label: Text(discipline),
+          selected: isSelected,
+          onSelected: (selected) {
+            setState(() {
+              if (selected) {
+                _disciplines.add(discipline);
+              } else {
+                _disciplines.remove(discipline);
+              }
+            });
+          },
+          selectedColor: Theme.of(context).colorScheme.primaryContainer,
+          checkmarkColor: Theme.of(context).colorScheme.primary,
+        );
+      }).toList(),
+    );
   }
 
   void _saveHorse() {
