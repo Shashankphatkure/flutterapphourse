@@ -13,145 +13,114 @@ class ProductDetailsScreen extends StatefulWidget {
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
-  int _currentImageIndex = 0;
   bool _isFavorite = false;
-  final PageController _pageController = PageController();
-
-  final List<String> _productImages = [
-    'https://picsum.photos/800/800?random=1',
-    'https://picsum.photos/800/800?random=2',
-    'https://picsum.photos/800/800?random=3',
-    'https://picsum.photos/800/800?random=4',
-  ];
+  int _quantity = 1;
+  final double _price = 1299.99;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              _isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: _isFavorite ? Colors.red : null,
-            ),
-            onPressed: () {
-              setState(() {
-                _isFavorite = !_isFavorite;
-              });
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.share),
-            onPressed: () {
-              // Implement share functionality
-            },
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: _buildImageCarousel(),
-                ),
-                SliverToBoxAdapter(
-                  child: _buildProductInfo(),
-                ),
-                SliverToBoxAdapter(
-                  child: _buildSpecifications(),
-                ),
-                SliverToBoxAdapter(
-                  child: _buildSellerInfo(),
-                ),
-                SliverToBoxAdapter(
-                  child: _buildReviews(),
-                ),
-                SliverToBoxAdapter(
-                  child: _buildSimilarProducts(),
-                ),
+      body: CustomScrollView(
+        slivers: [
+          _buildAppBar(),
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildImageGallery(),
+                _buildProductInfo(),
+                _buildSellerInfo(),
+                _buildDescription(),
+                _buildSpecifications(),
+                _buildRelatedProducts(),
               ],
             ),
           ),
-          _buildBottomBar(),
         ],
       ),
+      bottomNavigationBar: _buildBottomBar(),
     );
   }
 
-  Widget _buildImageCarousel() {
-    return Stack(
-      children: [
-        Hero(
-          tag: widget.heroTag,
-          child: SizedBox(
-            height: 400,
-            child: PageView.builder(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentImageIndex = index;
-                });
-              },
-              itemCount: _productImages.length,
-              itemBuilder: (context, index) {
-                return Image.network(
-                  _productImages[index],
-                  fit: BoxFit.cover,
-                );
-              },
-            ),
+  Widget _buildAppBar() {
+    return SliverAppBar(
+      expandedHeight: 0,
+      floating: true,
+      pinned: true,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () => Navigator.pop(context),
+      ),
+      actions: [
+        IconButton(
+          icon: Icon(
+            _isFavorite ? Icons.favorite : Icons.favorite_border,
+            color: _isFavorite ? Colors.red : null,
           ),
+          onPressed: () {
+            setState(() {
+              _isFavorite = !_isFavorite;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  _isFavorite ? 'Added to favorites' : 'Removed from favorites',
+                ),
+                duration: const Duration(seconds: 1),
+              ),
+            );
+          },
         ),
-        Positioned(
-          bottom: 16,
-          left: 0,
-          right: 0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(
-              _productImages.length,
-              (index) => Container(
-                width: 8,
-                height: 8,
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: _currentImageIndex == index
-                      ? Theme.of(context).primaryColor
-                      : Colors.grey.withOpacity(0.5),
+        IconButton(
+          icon: const Icon(Icons.share),
+          onPressed: () {
+            // Implement share functionality
+            _showShareOptions();
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildImageGallery() {
+    return Container(
+      height: 300,
+      child: Stack(
+        children: [
+          PageView.builder(
+            itemCount: 5,
+            itemBuilder: (context, index) {
+              return Hero(
+                tag: index == 0 ? widget.heroTag : 'product_image_$index',
+                child: Image.network(
+                  'https://picsum.photos/400/400?random=$index',
+                  fit: BoxFit.cover,
+                ),
+              );
+            },
+          ),
+          Positioned(
+            bottom: 16,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                5,
+                (index) => Container(
+                  width: 8,
+                  height: 8,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: index == 0 ? Colors.white : Colors.white.withOpacity(0.5),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        Positioned(
-          top: 16,
-          right: 16,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.green,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Text(
-              'Negotiable',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -182,9 +151,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   color: Theme.of(context).primaryColor,
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Text(
-                  '\$1,299.99',
-                  style: TextStyle(
+                child: Text(
+                  '\$${_price.toStringAsFixed(2)}',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
@@ -212,11 +181,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ),
               ),
               const Spacer(),
-              const Text(
-                'Posted 2 days ago',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 14,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.green[100],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Text(
+                  'In Stock',
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -226,29 +202,107 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     );
   }
 
-  Widget _buildSpecifications() {
+  Widget _buildSellerInfo() {
     return Card(
       margin: const EdgeInsets.all(16),
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            const Text(
-              'Specifications',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            const CircleAvatar(
+              radius: 30,
+              backgroundImage: NetworkImage('https://picsum.photos/100/100'),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'John\'s Tack Shop',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.star, color: Colors.yellow[700], size: 16),
+                      const Text(' 4.9 • 1.2k sales'),
+                    ],
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-            _buildSpecRow('Size', '17.5"'),
-            _buildSpecRow('Color', 'Brown'),
-            _buildSpecRow('Material', 'Premium Leather'),
-            _buildSpecRow('Condition', 'New'),
-            _buildSpecRow('Brand', 'Premium Tack'),
+            Column(
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () {
+                    _showMessageDialog();
+                  },
+                  icon: const Icon(Icons.message),
+                  label: const Text('Message'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    // Navigate to seller profile
+                  },
+                  child: const Text('View Shop'),
+                ),
+              ],
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildDescription() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Description',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Premium quality leather saddle with excellent craftsmanship. Perfect for both training and competition. Features include deep seat, balanced contact, and superior comfort for both horse and rider.',
+            style: TextStyle(
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSpecifications() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Specifications',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildSpecRow('Material', 'Premium Leather'),
+          _buildSpecRow('Size', '17.5"'),
+          _buildSpecRow('Color', 'Dark Brown'),
+          _buildSpecRow('Weight', '15 lbs'),
+          _buildSpecRow('Warranty', '2 Years'),
+        ],
       ),
     );
   }
@@ -260,9 +314,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 16,
+            style: TextStyle(
+              color: Colors.grey[600],
             ),
           ),
           const Spacer(),
@@ -270,7 +323,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             value,
             style: const TextStyle(
               fontWeight: FontWeight.w500,
-              fontSize: 16,
             ),
           ),
         ],
@@ -278,125 +330,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     );
   }
 
-  Widget _buildSellerInfo() {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      child: ListTile(
-        leading: const CircleAvatar(
-          backgroundImage: NetworkImage('https://picsum.photos/100/100'),
-        ),
-        title: const Text(
-          'John Smith',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        subtitle: Row(
-          children: [
-            Icon(Icons.star, color: Colors.yellow[700], size: 16),
-            const Text(' 4.9 • 120 reviews'),
-          ],
-        ),
-        trailing: OutlinedButton(
-          onPressed: () {
-            // Navigate to seller profile
-          },
-          child: const Text('View Profile'),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildReviews() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Reviews',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: 3,
-            itemBuilder: (context, index) => _buildReviewItem(),
-          ),
-          TextButton(
-            onPressed: () {
-              // Show all reviews
-            },
-            child: const Text('View All Reviews'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildReviewItem() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const CircleAvatar(
-                backgroundImage: NetworkImage('https://picsum.photos/50/50'),
-                radius: 16,
-              ),
-              const SizedBox(width: 8),
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Sarah Johnson',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    '1 month ago',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              Row(
-                children: [
-                  Icon(Icons.star, color: Colors.yellow, size: 16),
-                  const Text(' 5.0'),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Great quality saddle! The leather is beautiful and the craftsmanship is excellent. Highly recommended!',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSimilarProducts() {
+  Widget _buildRelatedProducts() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(
           padding: EdgeInsets.all(16),
           child: Text(
-            'Similar Products',
+            'Related Products',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -407,15 +350,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: 5,
-            itemBuilder: (context, index) => _buildSimilarProductCard(),
+            itemBuilder: (context, index) => _buildRelatedProductCard(index),
           ),
         ),
-        const SizedBox(height: 16),
       ],
     );
   }
 
-  Widget _buildSimilarProductCard() {
+  Widget _buildRelatedProductCard(int index) {
     return Card(
       margin: const EdgeInsets.only(right: 16),
       child: SizedBox(
@@ -423,34 +365,29 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(4),
-              ),
-              child: Image.network(
-                'https://picsum.photos/160/120',
-                height: 120,
-                width: 160,
-                fit: BoxFit.cover,
-              ),
+            Image.network(
+              'https://picsum.photos/160/100?random=$index',
+              height: 100,
+              width: 160,
+              fit: BoxFit.cover,
             ),
-            const Padding(
-              padding: EdgeInsets.all(8),
+            Padding(
+              padding: const EdgeInsets.all(8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Leather Saddle',
+                  const Text(
+                    'Related Product',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    '\$999.99',
+                    '\$${(999.99 - index * 100).toStringAsFixed(2)}',
                     style: TextStyle(
-                      color: Colors.blue,
+                      color: Theme.of(context).primaryColor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -477,27 +414,171 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       ),
       child: Row(
         children: [
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: () {
-                // Open message dialog
-              },
-              icon: const Icon(Icons.message),
-              label: const Text('Message'),
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey[300]!),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.remove),
+                  onPressed: () {
+                    if (_quantity > 1) {
+                      setState(() => _quantity--);
+                    }
+                  },
+                ),
+                Text(
+                  '$_quantity',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () {
+                    setState(() => _quantity++);
+                  },
+                ),
+              ],
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
-            child: FilledButton.icon(
+            child: ElevatedButton.icon(
               onPressed: () {
-                // Add to cart
+                _addToCart();
               },
               icon: const Icon(Icons.shopping_cart),
+              label: const Text('Add to Cart'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: FilledButton.icon(
+              onPressed: () {
+                _buyNow();
+              },
+              icon: const Icon(Icons.flash_on),
               label: const Text('Buy Now'),
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  void _showMessageDialog() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Message Seller',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  hintText: 'Write your message...',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancel'),
+                  ),
+                  FilledButton(
+                    onPressed: () {
+                      // Send message
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Message sent to seller'),
+                        ),
+                      );
+                    },
+                    child: const Text('Send'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showShareOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.copy),
+            title: const Text('Copy Link'),
+            onTap: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Link copied to clipboard')),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.share),
+            title: const Text('Share via...'),
+            onTap: () {
+              Navigator.pop(context);
+              // Implement share functionality
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _addToCart() {
+    // Implement add to cart
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Added $_quantity item(s) to cart'),
+        action: SnackBarAction(
+          label: 'View Cart',
+          onPressed: () {
+            // Navigate to cart
+          },
+        ),
+      ),
+    );
+  }
+
+  void _buyNow() {
+    // Implement buy now
+    // Navigate to checkout
   }
 } 

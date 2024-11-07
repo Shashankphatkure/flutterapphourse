@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'product_details_screen.dart';
+import 'wishlist_screen.dart';
 
 class MarketplaceScreen extends StatelessWidget {
   const MarketplaceScreen({super.key});
@@ -13,7 +14,12 @@ class MarketplaceScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.favorite_border),
             onPressed: () {
-              // Navigate to wishlist
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const WishlistScreen(),
+                ),
+              );
             },
           ),
           IconButton(
