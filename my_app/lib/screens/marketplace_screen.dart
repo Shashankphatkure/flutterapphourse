@@ -96,44 +96,47 @@ class MarketplaceScreen extends StatelessWidget {
 
   Widget _buildCategories(BuildContext context) {
     final categories = [
-      {'icon': Icons.chair, 'label': 'Saddles', 'items': '245 items'},
-      {'icon': Icons.link, 'label': 'Bridles', 'items': '158 items'},
-      {'icon': Icons.brush, 'label': 'Grooming', 'items': '89 items'},
-      {'icon': Icons.checkroom, 'label': 'Apparel', 'items': '324 items'},
-      {'icon': Icons.sports, 'label': 'Equipment', 'items': '176 items'},
+      {'icon': Icons.chair, 'label': 'Saddles', 'items': '245'},
+      {'icon': Icons.link, 'label': 'Bridles', 'items': '158'},
+      {'icon': Icons.brush, 'label': 'Grooming', 'items': '89'},
+      {'icon': Icons.checkroom, 'label': 'Apparel', 'items': '324'},
+      {'icon': Icons.sports, 'label': 'Equipment', 'items': '176'},
     ];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Text(
-            'Categories',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Text(
+              'Categories',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-        ),
-        SizedBox(
-          height: 120,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            itemCount: categories.length,
-            itemBuilder: (context, index) {
-              final category = categories[index];
-              return _buildCategoryCard(
-                context,
-                category['icon'] as IconData,
-                category['label'] as String,
-                category['items'] as String,
-              );
-            },
+          SizedBox(
+            height: 90,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                final category = categories[index];
+                return _buildCategoryCard(
+                  context,
+                  category['icon'] as IconData,
+                  category['label'] as String,
+                  category['items'] as String,
+                );
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -143,43 +146,60 @@ class MarketplaceScreen extends StatelessWidget {
     String label,
     String items,
   ) {
-    return Card(
-      margin: const EdgeInsets.all(8),
-      child: InkWell(
-        onTap: () {
-          // Navigate to category
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          width: 100,
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.yellow[200],
-                  shape: BoxShape.circle,
+    return SizedBox(
+      width: 80,
+      child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: InkWell(
+          onTap: () {
+            // Navigate to category
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.yellow[200],
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    icon,
+                    color: Colors.black87,
+                    size: 20,
+                  ),
                 ),
-                child: Icon(icon, color: Colors.black87),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
+                const SizedBox(height: 4),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                items,
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 12,
+                const SizedBox(height: 2),
+                Text(
+                  '$items',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 10,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

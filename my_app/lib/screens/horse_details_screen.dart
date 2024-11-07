@@ -2,80 +2,92 @@ import 'package:flutter/material.dart';
 import 'add_horse_event_screen.dart';
 import 'edit_horse_screen.dart';
 
-class HorseDetailsScreen extends StatelessWidget {
-  const HorseDetailsScreen({super.key});
+class HorseDetailsScreen extends StatefulWidget {
+  final String heroTag;
+
+  const HorseDetailsScreen({
+    super.key,
+    required this.heroTag,
+  });
+
+  @override
+  State<HorseDetailsScreen> createState() => _HorseDetailsScreenState();
+}
+
+class _HorseDetailsScreenState extends State<HorseDetailsScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  final ScrollController _scrollController = ScrollController();
+  bool _showTitle = false;
+
+  final List<String> _horseImages = [
+    'https://picsum.photos/800/600?random=1',
+    'https://picsum.photos/800/600?random=2',
+    'https://picsum.photos/800/600?random=3',
+  ];
+
+  int _currentImageIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 4, vsync: this);
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController.offset > 200 && !_showTitle) {
+      setState(() => _showTitle = true);
+    } else if (_scrollController.offset <= 200 && _showTitle) {
+      setState(() => _showTitle = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        body: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [
-              SliverAppBar(
-                expandedHeight: 300.0,
-                floating: false,
-                pinned: true,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Hero(
-                        tag: 'horse_image',
-                        child: Image.network(
-                          'https://picsum.photos/800/600',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.transparent,
-                              Colors.black.withOpacity(0.7),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 48,
-                        left: 16,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildStatusBadge(context),
-                            const SizedBox(height: 8),
-                            const Text(
-                              'Thunder',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                const Text(
-                                  'Arabian • 8 years old',
-                                  style: TextStyle(
-                                    color: Colors.white70,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                _buildVerifiedBadge(),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+    return Scaffold(
+      body: NestedScrollView(
+        controller: _scrollController,
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
+          return [
+            SliverAppBar(
+              expandedHeight: 400.0,
+              floating: false,
+              pinned: true,
+              title: AnimatedOpacity(
+                opacity: _showTitle ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 200),
+                child: const Text('Thunder'),
+              ),
+              flexibleSpace: FlexibleSpaceBar(
+                background: _buildImageCarousel(),
+              ),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.pop(context),
+              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () => _navigateToEdit(context),
                 ),
-                bottom: TabBar(
+                IconButton(
+                  icon: const Icon(Icons.share),
+                  onPressed: () => _shareHorseProfile(),
+                ),
+                _buildMoreMenu(),
+              ],
+            ),
+            SliverPersistentHeader(
+              delegate: _SliverAppBarDelegate(
+                TabBar(
+                  controller: _tabController,
                   tabs: const [
                     Tab(icon: Icon(Icons.info_outline), text: 'Info'),
                     Tab(icon: Icon(Icons.medical_services_outlined), text: 'Health'),
@@ -85,87 +97,152 @@ class HorseDetailsScreen extends StatelessWidget {
                   indicatorColor: Theme.of(context).colorScheme.primary,
                   labelColor: Theme.of(context).colorScheme.primary,
                 ),
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const EditHorseScreen(isEditing: true),
-                        ),
-                      );
-                    },
-                  ),
-                  PopupMenuButton(
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(
-                        value: 'share',
-                        child: Text('Share Profile'),
-                      ),
-                      const PopupMenuItem(
-                        value: 'export',
-                        child: Text('Export Data'),
-                      ),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: Text('Delete Horse'),
-                      ),
-                    ],
-                    onSelected: (value) {
-                      // Handle menu selection
-                    },
-                  ),
-                ],
               ),
-            ];
-          },
-          body: TabBarView(
-            children: [
-              _buildInfoTab(context),
-              _buildHealthTab(context),
-              _buildTrainingTab(context),
-              _buildContactsTab(context),
-            ],
-          ),
+              pinned: true,
+            ),
+          ];
+        },
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            _buildInfoTab(),
+            _buildHealthTab(),
+            _buildTrainingTab(),
+            _buildContactsTab(),
+          ],
         ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const AddHorseEventScreen(
-                  horseName: 'Thunder',
-                ),
+      ),
+      floatingActionButton: _buildFloatingActionButton(),
+    );
+  }
+
+  Widget _buildImageCarousel() {
+    return Stack(
+      children: [
+        PageView.builder(
+          itemCount: _horseImages.length,
+          onPageChanged: (index) {
+            setState(() => _currentImageIndex = index);
+          },
+          itemBuilder: (context, index) {
+            return Hero(
+              tag: index == 0 ? widget.heroTag : 'horse_image_$index',
+              child: Image.network(
+                _horseImages[index],
+                fit: BoxFit.cover,
               ),
             );
           },
-          label: const Text('Add Event'),
-          icon: const Icon(Icons.add),
-          backgroundColor: Theme.of(context).colorScheme.primary,
         ),
+        Positioned(
+          bottom: 100,
+          left: 0,
+          right: 0,
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  _horseImages.length,
+                  (index) => Container(
+                    width: 8,
+                    height: 8,
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _currentImageIndex == index
+                          ? Theme.of(context).colorScheme.primary
+                          : Colors.white.withOpacity(0.5),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildHorseInfo(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHorseInfo() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildStatusBadge(),
+          const SizedBox(height: 8),
+          const Text(
+            'Thunder',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              shadows: [
+                Shadow(
+                  offset: Offset(0, 2),
+                  blurRadius: 4,
+                  color: Colors.black38,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              const Icon(Icons.pets, color: Colors.white, size: 16),
+              const SizedBox(width: 4),
+              const Text(
+                'Arabian Stallion',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  shadows: [
+                    Shadow(
+                      offset: Offset(0, 1),
+                      blurRadius: 2,
+                      color: Colors.black38,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              const Icon(Icons.cake, color: Colors.white, size: 16),
+              const SizedBox(width: 4),
+              const Text(
+                '8 years old',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  shadows: [
+                    Shadow(
+                      offset: Offset(0, 1),
+                      blurRadius: 2,
+                      color: Colors.black38,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildStatusBadge(BuildContext context) {
+  Widget _buildStatusBadge() {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 6,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary,
+        color: Colors.green,
         borderRadius: BorderRadius.circular(20),
       ),
       child: const Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.favorite,
-            color: Colors.white,
-            size: 16,
-          ),
+          Icon(Icons.check_circle, color: Colors.white, size: 16),
           SizedBox(width: 4),
           Text(
             'HEALTHY',
@@ -180,27 +257,67 @@ class HorseDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildVerifiedBadge() {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: Colors.blue,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: const Icon(
-        Icons.verified,
-        color: Colors.white,
-        size: 16,
+  Widget _buildMoreMenu() {
+    return PopupMenuButton(
+      icon: const Icon(Icons.more_vert),
+      itemBuilder: (context) => [
+        const PopupMenuItem(
+          value: 'export',
+          child: Text('Export Data'),
+        ),
+        const PopupMenuItem(
+          value: 'archive',
+          child: Text('Archive Horse'),
+        ),
+        PopupMenuItem(
+          value: 'delete',
+          child: Text(
+            'Delete Horse',
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+        ),
+      ],
+      onSelected: (value) {
+        // Handle menu selection
+      },
+    );
+  }
+
+  Widget _buildFloatingActionButton() {
+    return FloatingActionButton.extended(
+      onPressed: () => _showAddEventBottomSheet(),
+      icon: const Icon(Icons.add),
+      label: const Text('Add Event'),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+    );
+  }
+
+  void _navigateToEdit(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const EditHorseScreen(isEditing: true),
       ),
     );
   }
 
-  Widget _buildInfoTab(BuildContext context) {
+  void _shareHorseProfile() {
+    // Implement share functionality
+  }
+
+  void _showAddEventBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => AddHorseEventScreen(horseName: 'Thunder'),
+    );
+  }
+
+  Widget _buildInfoTab() {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         _buildInfoCard(
-          context,
           'Basic Information',
           [
             _buildInfoRow('Gender', 'Stallion'),
@@ -212,7 +329,6 @@ class HorseDetailsScreen extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         _buildInfoCard(
-          context,
           'Competition Details',
           [
             _buildInfoRow('Discipline', 'Dressage'),
@@ -224,60 +340,14 @@ class HorseDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard(BuildContext context, String title, List<Widget> items) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        const SizedBox(height: 12),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: items,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.grey,
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHealthTab(BuildContext context) {
+  Widget _buildHealthTab() {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _buildInfoCard(
-          context,
+        _buildHealthCard(
           'Recent Health Records',
           [
             _buildHealthRecord(
-              context,
               'Veterinary Check',
               'Dr. Smith',
               '15 March 2024',
@@ -285,64 +355,57 @@ class HorseDetailsScreen extends StatelessWidget {
               Colors.green,
             ),
             _buildHealthRecord(
-              context,
               'Vaccination',
               'Dr. Johnson',
               '1 March 2024',
               'Annual flu vaccine',
               Colors.blue,
             ),
-            _buildHealthRecord(
-              context,
-              'Dental Check',
-              'Dr. Williams',
-              '15 February 2024',
-              'Routine floating completed',
-              Colors.orange,
-            ),
           ],
         ),
         const SizedBox(height: 16),
-        _buildInfoCard(
-          context,
-          'Medications & Supplements',
+        _buildHealthCard(
+          'Upcoming Appointments',
           [
-            _buildMedicationRow('Joint Supplement', 'Daily - 2 scoops'),
-            _buildMedicationRow('Dewormer', 'Every 3 months'),
-            _buildMedicationRow('Probiotic', 'Daily - 1 scoop'),
+            _buildAppointment(
+              'Dental Check',
+              'Tomorrow, 10:00 AM',
+              'Dr. Williams',
+            ),
+            _buildAppointment(
+              'Farrier Visit',
+              'Next Week, Tuesday',
+              'John Smith',
+            ),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildTrainingTab(BuildContext context) {
+  Widget _buildTrainingTab() {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _buildInfoCard(
-          context,
-          'Training Progress',
+        _buildTrainingCard(
+          'Progress',
           [
-            _buildProgressBar(context, 'Dressage', 0.8),
-            _buildProgressBar(context, 'Jumping', 0.6),
-            _buildProgressBar(context, 'Ground Work', 0.9),
+            _buildProgressBar('Dressage', 0.8),
+            _buildProgressBar('Jumping', 0.6),
+            _buildProgressBar('Ground Work', 0.9),
           ],
         ),
         const SizedBox(height: 16),
-        _buildInfoCard(
-          context,
+        _buildTrainingCard(
           'Recent Sessions',
           [
             _buildTrainingSession(
-              context,
               'Dressage Training',
               'Sarah Johnson',
               '14 March 2024',
               'Worked on extended trot and canter transitions',
             ),
             _buildTrainingSession(
-              context,
               'Jump Training',
               'Mike Thompson',
               '12 March 2024',
@@ -354,173 +417,202 @@ class HorseDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContactsTab(BuildContext context) {
+  Widget _buildContactsTab() {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _buildInfoCard(
-          context,
-          'Emergency Contacts',
-          [
-            _buildContactCard(
-              context,
-              'Primary Veterinarian',
-              'Dr. Sarah Smith',
-              '+1 (555) 123-4567',
-              Icons.medical_services,
-              Colors.red,
-            ),
-            _buildContactCard(
-              context,
-              'Farrier',
-              'John Davidson',
-              '+1 (555) 234-5678',
-              Icons.build,
-              Colors.brown,
-            ),
-          ],
+        _buildContactCard(
+          'Primary Veterinarian',
+          'Dr. Sarah Smith',
+          '+1 (555) 123-4567',
+          Icons.medical_services,
+          Colors.red,
         ),
-        const SizedBox(height: 16),
-        _buildInfoCard(
-          context,
-          'Care Team',
-          [
-            _buildContactCard(
-              context,
-              'Trainer',
-              'Emily Wilson',
-              '+1 (555) 345-6789',
-              Icons.sports,
-              Colors.blue,
-            ),
-            _buildContactCard(
-              context,
-              'Barn Manager',
-              'Michael Brown',
-              '+1 (555) 456-7890',
-              Icons.home,
-              Colors.green,
-            ),
-          ],
+        _buildContactCard(
+          'Farrier',
+          'John Davidson',
+          '+1 (555) 234-5678',
+          Icons.build,
+          Colors.brown,
+        ),
+        _buildContactCard(
+          'Trainer',
+          'Emily Wilson',
+          '+1 (555) 345-6789',
+          Icons.sports,
+          Colors.blue,
         ),
       ],
     );
   }
 
-  Widget _buildHealthRecord(
-    BuildContext context,
-    String title,
-    String provider,
-    String date,
-    String notes,
-    Color color,
-  ) {
+  Widget _buildInfoCard(String title, List<Widget> items) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: color.withOpacity(0.2),
-          child: Icon(Icons.medical_services, color: color),
-        ),
-        title: Text(title),
-        subtitle: Column(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(provider),
             Text(
-              date,
-              style: TextStyle(color: Colors.grey[600]),
+              title,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
-            Text(
-              notes,
-              style: const TextStyle(fontStyle: FontStyle.italic),
-            ),
+            const SizedBox(height: 16),
+            ...items,
           ],
         ),
-        isThreeLine: true,
       ),
     );
   }
 
-  Widget _buildMedicationRow(String medication, String dosage) {
-    return ListTile(
-      leading: const Icon(Icons.medication),
-      title: Text(medication),
-      subtitle: Text(dosage),
-      trailing: IconButton(
-        icon: const Icon(Icons.notifications_outlined),
-        onPressed: () {
-          // TODO: Set medication reminder
-        },
-      ),
-    );
-  }
-
-  Widget _buildProgressBar(BuildContext context, String skill, double progress) {
+  Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(skill),
-              Text('${(progress * 100).toInt()}%'),
-            ],
+          Text(
+            label,
+            style: TextStyle(color: Colors.grey[600]),
           ),
-          const SizedBox(height: 4),
-          LinearProgressIndicator(
-            value: progress,
-            backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-            valueColor: AlwaysStoppedAnimation<Color>(
-              Theme.of(context).colorScheme.primary,
-            ),
+          Text(
+            value,
+            style: const TextStyle(fontWeight: FontWeight.w500),
           ),
         ],
       ),
     );
   }
 
+  Widget _buildHealthCard(String title, List<Widget> items) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 16),
+            ...items,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHealthRecord(
+    String title,
+    String provider,
+    String date,
+    String notes,
+    Color color,
+  ) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: color.withOpacity(0.2),
+        child: Icon(Icons.medical_services, color: color),
+      ),
+      title: Text(title),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(provider),
+          Text(date, style: TextStyle(color: Colors.grey[600])),
+          Text(notes, style: const TextStyle(fontStyle: FontStyle.italic)),
+        ],
+      ),
+      isThreeLine: true,
+    );
+  }
+
+  Widget _buildAppointment(String title, String time, String provider) {
+    return ListTile(
+      leading: const CircleAvatar(
+        child: Icon(Icons.event),
+      ),
+      title: Text(title),
+      subtitle: Text(provider),
+      trailing: Text(
+        time,
+        style: TextStyle(color: Theme.of(context).colorScheme.primary),
+      ),
+    );
+  }
+
+  Widget _buildProgressBar(String skill, double progress) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(skill),
+            Text('${(progress * 100).toInt()}%'),
+          ],
+        ),
+        const SizedBox(height: 4),
+        LinearProgressIndicator(
+          value: progress,
+          backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+          valueColor: AlwaysStoppedAnimation<Color>(
+            Theme.of(context).colorScheme.primary,
+          ),
+        ),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+
+  Widget _buildTrainingCard(String title, List<Widget> items) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 16),
+            ...items,
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildTrainingSession(
-    BuildContext context,
     String title,
     String trainer,
     String date,
     String notes,
   ) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
-          child: Icon(
-            Icons.sports,
-            color: Theme.of(context).colorScheme.secondary,
-          ),
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
+        child: Icon(
+          Icons.sports,
+          color: Theme.of(context).colorScheme.secondary,
         ),
-        title: Text(title),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(trainer),
-            Text(
-              date,
-              style: TextStyle(color: Colors.grey[600]),
-            ),
-            Text(
-              notes,
-              style: const TextStyle(fontStyle: FontStyle.italic),
-            ),
-          ],
-        ),
-        isThreeLine: true,
       ),
+      title: Text(title),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(trainer),
+          Text(date, style: TextStyle(color: Colors.grey[600])),
+          Text(notes, style: const TextStyle(fontStyle: FontStyle.italic)),
+        ],
+      ),
+      isThreeLine: true,
     );
   }
 
   Widget _buildContactCard(
-    BuildContext context,
     String role,
     String name,
     String phone,
@@ -528,7 +620,6 @@ class HorseDetailsScreen extends StatelessWidget {
     Color color,
   ) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: color.withOpacity(0.2),
@@ -547,19 +638,39 @@ class HorseDetailsScreen extends StatelessWidget {
           children: [
             IconButton(
               icon: const Icon(Icons.message),
-              onPressed: () {
-                // TODO: Implement messaging
-              },
+              onPressed: () {},
             ),
             IconButton(
               icon: const Icon(Icons.phone),
-              onPressed: () {
-                // TODO: Implement calling
-              },
+              onPressed: () {},
             ),
           ],
         ),
       ),
     );
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar _tabBar;
+
+  _SliverAppBarDelegate(this._tabBar);
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return Container(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: _tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return false;
   }
 } 

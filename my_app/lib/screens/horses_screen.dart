@@ -71,7 +71,9 @@ class HorsesScreen extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const HorseDetailsScreen(),
+        builder: (context) => HorseDetailsScreen(
+          heroTag: 'horse_$index',
+        ),
       ),
     );
   }
