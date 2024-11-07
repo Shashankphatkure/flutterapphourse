@@ -1,307 +1,222 @@
 import 'package:flutter/material.dart';
-import 'seller_profile_screen.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
-  const ProductDetailsScreen({super.key});
+  final String heroTag;
+
+  const ProductDetailsScreen({
+    super.key,
+    required this.heroTag,
+  });
 
   @override
   State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
-  final PageController _imageController = PageController();
-  int _currentImage = 0;
+  int _currentImageIndex = 0;
   bool _isFavorite = false;
+  final PageController _pageController = PageController();
 
-  final List<String> _images = [
-    'https://picsum.photos/800/600',
-    'https://picsum.photos/800/601',
-    'https://picsum.photos/800/602',
-    'https://picsum.photos/800/603',
+  final List<String> _productImages = [
+    'https://picsum.photos/800/800?random=1',
+    'https://picsum.photos/800/800?random=2',
+    'https://picsum.photos/800/800?random=3',
+    'https://picsum.photos/800/800?random=4',
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 400,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Stack(
-                children: [
-                  PageView.builder(
-                    controller: _imageController,
-                    onPageChanged: (index) {
-                      setState(() {
-                        _currentImage = index;
-                      });
-                    },
-                    itemCount: _images.length,
-                    itemBuilder: (context, index) {
-                      return Image.network(
-                        _images[index],
-                        fit: BoxFit.cover,
-                      );
-                    },
-                  ),
-                  Positioned(
-                    bottom: 16,
-                    left: 0,
-                    right: 0,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: _images.asMap().entries.map((entry) {
-                        return Container(
-                          width: 8,
-                          height: 8,
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: _currentImage == entry.key
-                                ? Theme.of(context).colorScheme.primary
-                                : Colors.white.withOpacity(0.5),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
-              ),
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              _isFavorite ? Icons.favorite : Icons.favorite_border,
+              color: _isFavorite ? Colors.red : null,
             ),
-            actions: [
-              IconButton(
-                icon: Icon(
-                  _isFavorite ? Icons.favorite : Icons.favorite_border,
-                  color: _isFavorite ? Colors.red : null,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _isFavorite = !_isFavorite;
-                  });
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.share),
-                onPressed: () {
-                  // TODO: Implement share
-                },
-              ),
-            ],
+            onPressed: () {
+              setState(() {
+                _isFavorite = !_isFavorite;
+              });
+            },
           ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Premium Leather Saddle',
-                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Posted 2 days ago',
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            '\$1,299.99',
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.green.shade100,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              'Negotiable',
-                              style: TextStyle(
-                                color: Colors.green.shade700,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  _buildSellerInfo(context),
-                  const SizedBox(height: 24),
-                  _buildSpecifications(context),
-                  const SizedBox(height: 24),
-                  _buildDescription(context),
-                  const SizedBox(height: 24),
-                  _buildSimilarProducts(context),
-                ],
-              ),
-            ),
+          IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: () {
+              // Implement share functionality
+            },
           ),
         ],
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  // TODO: Implement message seller
-                },
-                icon: const Icon(Icons.message_outlined),
-                label: const Text('Message'),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: FilledButton.icon(
-                onPressed: () {
-                  // TODO: Implement buy now
-                },
-                icon: const Icon(Icons.shopping_cart_outlined),
-                label: const Text('Buy Now'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSellerInfo(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const SellerProfileScreen(),
-          ),
-        );
-      },
-      child: Row(
+      body: Column(
         children: [
-          const CircleAvatar(
-            radius: 24,
-            backgroundImage: NetworkImage('https://picsum.photos/100'),
-          ),
-          const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'John Smith',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: _buildImageCarousel(),
                 ),
-                const Row(
-                  children: [
-                    Icon(
-                      Icons.star,
-                      size: 16,
-                      color: Colors.amber,
-                    ),
-                    SizedBox(width: 4),
-                    Text('4.8 (120 reviews)'),
-                  ],
+                SliverToBoxAdapter(
+                  child: _buildProductInfo(),
+                ),
+                SliverToBoxAdapter(
+                  child: _buildSpecifications(),
+                ),
+                SliverToBoxAdapter(
+                  child: _buildSellerInfo(),
+                ),
+                SliverToBoxAdapter(
+                  child: _buildReviews(),
+                ),
+                SliverToBoxAdapter(
+                  child: _buildSimilarProducts(),
                 ),
               ],
             ),
           ),
-          TextButton(
-            onPressed: () {
-              // TODO: Implement follow seller
-            },
-            child: const Text('Follow'),
-          ),
+          _buildBottomBar(),
         ],
       ),
     );
   }
 
-  Widget _buildSpecifications(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildImageCarousel() {
+    return Stack(
       children: [
-        Text(
-          'Specifications',
-          style: Theme.of(context).textTheme.titleLarge,
+        Hero(
+          tag: widget.heroTag,
+          child: SizedBox(
+            height: 400,
+            child: PageView.builder(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentImageIndex = index;
+                });
+              },
+              itemCount: _productImages.length,
+              itemBuilder: (context, index) {
+                return Image.network(
+                  _productImages[index],
+                  fit: BoxFit.cover,
+                );
+              },
+            ),
+          ),
         ),
-        const SizedBox(height: 16),
-        Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          children: [
-            _buildSpecItem(Icons.straighten, 'Size', '17.5"'),
-            _buildSpecItem(Icons.color_lens, 'Color', 'Brown'),
-            _buildSpecItem(Icons.category, 'Type', 'Dressage'),
-            _buildSpecItem(Icons.new_releases, 'Condition', 'Like New'),
-          ],
+        Positioned(
+          bottom: 16,
+          left: 0,
+          right: 0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              _productImages.length,
+              (index) => Container(
+                width: 8,
+                height: 8,
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _currentImageIndex == index
+                      ? Theme.of(context).primaryColor
+                      : Colors.grey.withOpacity(0.5),
+                ),
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          top: 16,
+          right: 16,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.green,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Text(
+              'Negotiable',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildSpecItem(IconData icon, String label, String value) {
-    return Container(
-      width: MediaQuery.of(context).size.width / 2 - 24,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
+  Widget _buildProductInfo() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 12,
+              const Expanded(
+                child: Text(
+                  'Premium Leather Saddle',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w500,
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Text(
+                  '\$1,299.99',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(Icons.star, color: Colors.yellow[700], size: 20),
+              const Text(
+                ' 4.8',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              const Text(
+                ' (245 reviews)',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 14,
+                ),
+              ),
+              const Spacer(),
+              const Text(
+                'Posted 2 days ago',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 14,
                 ),
               ),
             ],
@@ -311,84 +226,278 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     );
   }
 
-  Widget _buildDescription(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Description',
-          style: Theme.of(context).textTheme.titleLarge,
+  Widget _buildSpecifications() {
+    return Card(
+      margin: const EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Specifications',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildSpecRow('Size', '17.5"'),
+            _buildSpecRow('Color', 'Brown'),
+            _buildSpecRow('Material', 'Premium Leather'),
+            _buildSpecRow('Condition', 'New'),
+            _buildSpecRow('Brand', 'Premium Tack'),
+          ],
         ),
-        const SizedBox(height: 16),
-        const Text(
-          'Premium leather dressage saddle in excellent condition. Made with the finest leather and expert craftsmanship. Features include adjustable knee blocks, deep seat, and extended flaps. Perfect for serious riders looking for quality equipment.',
-          style: TextStyle(
-            height: 1.5,
-          ),
-        ),
-      ],
+      ),
     );
   }
 
-  Widget _buildSimilarProducts(BuildContext context) {
+  Widget _buildSpecRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.grey,
+              fontSize: 16,
+            ),
+          ),
+          const Spacer(),
+          Text(
+            value,
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSellerInfo() {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: ListTile(
+        leading: const CircleAvatar(
+          backgroundImage: NetworkImage('https://picsum.photos/100/100'),
+        ),
+        title: const Text(
+          'John Smith',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        subtitle: Row(
+          children: [
+            Icon(Icons.star, color: Colors.yellow[700], size: 16),
+            const Text(' 4.9 • 120 reviews'),
+          ],
+        ),
+        trailing: OutlinedButton(
+          onPressed: () {
+            // Navigate to seller profile
+          },
+          child: const Text('View Profile'),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReviews() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Reviews',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 3,
+            itemBuilder: (context, index) => _buildReviewItem(),
+          ),
+          TextButton(
+            onPressed: () {
+              // Show all reviews
+            },
+            child: const Text('View All Reviews'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReviewItem() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const CircleAvatar(
+                backgroundImage: NetworkImage('https://picsum.photos/50/50'),
+                radius: 16,
+              ),
+              const SizedBox(width: 8),
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Sarah Johnson',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    '1 month ago',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Row(
+                children: [
+                  Icon(Icons.star, color: Colors.yellow, size: 16),
+                  const Text(' 5.0'),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Great quality saddle! The leather is beautiful and the craftsmanship is excellent. Highly recommended!',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSimilarProducts() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Similar Products',
-          style: Theme.of(context).textTheme.titleLarge,
+        const Padding(
+          padding: EdgeInsets.all(16),
+          child: Text(
+            'Similar Products',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
-        const SizedBox(height: 16),
         SizedBox(
           height: 200,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: 5,
-            itemBuilder: (context, index) {
-              return Container(
-                width: 160,
-                margin: const EdgeInsets.only(right: 16),
-                child: Card(
-                  clipBehavior: Clip.antiAlias,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Image.network(
-                          'https://picsum.photos/200',
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Similar Saddle',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                            Text(
-                              '\$999.99',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
+            itemBuilder: (context, index) => _buildSimilarProductCard(),
           ),
         ),
+        const SizedBox(height: 16),
       ],
+    );
+  }
+
+  Widget _buildSimilarProductCard() {
+    return Card(
+      margin: const EdgeInsets.only(right: 16),
+      child: SizedBox(
+        width: 160,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(4),
+              ),
+              child: Image.network(
+                'https://picsum.photos/160/120',
+                height: 120,
+                width: 160,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Leather Saddle',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    '\$999.99',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomBar() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: () {
+                // Open message dialog
+              },
+              icon: const Icon(Icons.message),
+              label: const Text('Message'),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: FilledButton.icon(
+              onPressed: () {
+                // Add to cart
+              },
+              icon: const Icon(Icons.shopping_cart),
+              label: const Text('Buy Now'),
+            ),
+          ),
+        ],
+      ),
     );
   }
 } 
