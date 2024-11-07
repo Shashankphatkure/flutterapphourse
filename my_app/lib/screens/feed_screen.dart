@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 class FeedScreen extends StatelessWidget {
   const FeedScreen({super.key});
@@ -7,22 +8,7 @@ class FeedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Image.network(
-              'https://picsum.photos/40', // Replace with your app logo
-              width: 32,
-              height: 32,
-            ),
-            const SizedBox(width: 8),
-            const Text(
-              'Pipel',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
+        title: const Text('Pipel'),
         actions: [
           IconButton(
             icon: Stack(
@@ -38,8 +24,8 @@ class FeedScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     constraints: const BoxConstraints(
-                      minWidth: 12,
-                      minHeight: 12,
+                      minWidth: 14,
+                      minHeight: 14,
                     ),
                     child: const Text(
                       '2',
@@ -53,7 +39,9 @@ class FeedScreen extends StatelessWidget {
                 ),
               ],
             ),
-            onPressed: () {},
+            onPressed: () {
+              // Handle notifications
+            },
           ),
           IconButton(
             icon: Stack(
@@ -69,8 +57,8 @@ class FeedScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     constraints: const BoxConstraints(
-                      minWidth: 12,
-                      minHeight: 12,
+                      minWidth: 14,
+                      minHeight: 14,
                     ),
                     child: const Text(
                       '5',
@@ -84,42 +72,43 @@ class FeedScreen extends StatelessWidget {
                 ),
               ],
             ),
-            onPressed: () {},
+            onPressed: () {
+              // Handle messages
+            },
           ),
-          const SizedBox(width: 8),
         ],
       ),
-      body: Column(
-        children: [
-          _buildStorySection(),
-          const SizedBox(height: 8),
-          _buildTabBar(),
-          Expanded(
-            child: _buildFeedList(),
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: _buildStories(),
+          ),
+          const SliverToBoxAdapter(
+            child: Divider(),
+          ),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => _buildPost(context, index),
+              childCount: 10, // Number of posts
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStorySection() {
+  Widget _buildStories() {
     return Container(
-      height: 110,
-      padding: const EdgeInsets.only(top: 16, bottom: 8),
+      height: 100,
+      margin: const EdgeInsets.symmetric(vertical: 8),
       child: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
         scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
         children: [
           _buildAddStoryItem(),
           ...List.generate(
-            10,
-            (index) => Padding(
-              padding: const EdgeInsets.only(left: 16),
-              child: _buildStoryItem(
-                'User ${index + 1}',
-                index == 1,
-              ),
-            ),
+            6,
+            (index) => _buildStoryItem(index),
           ),
         ],
       ),
@@ -127,274 +116,289 @@ class FeedScreen extends StatelessWidget {
   }
 
   Widget _buildAddStoryItem() {
-    return Column(
-      children: [
-        Container(
-          width: 68,
-          height: 68,
-          decoration: BoxDecoration(
-            color: const Color(0xFFE7FF4B),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Colors.white,
-              width: 3,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: const Icon(
-            Icons.add,
-            size: 32,
-            color: Colors.black,
-          ),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'Your story',
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStoryItem(String username, bool isLive) {
-    return Column(
-      children: [
-        Stack(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(3),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.purple,
-                    Colors.orange.shade700,
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Container(
-                padding: const EdgeInsets.all(3),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: CircleAvatar(
-                  radius: 30,
-                  backgroundImage: NetworkImage(
-                    'https://picsum.photos/200?random=$username',
-                  ),
-                ),
-              ),
-            ),
-            if (isLive)
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 8),
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: const Text(
-                    'LIVE',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Text(
-          username,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTabBar() {
     return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey.withOpacity(0.2),
-          ),
-        ),
-      ),
-      child: Row(
+      width: 70,
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      child: Column(
         children: [
-          _buildTab('Home', true),
-          _buildTab('For you', false),
+          Container(
+            width: 70,
+            height: 70,
+            margin: const EdgeInsets.only(bottom: 4),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                // Handle add story
+              },
+            ),
+          ),
+          const Text(
+            'Add Story',
+            style: TextStyle(
+              fontSize: 12,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildTab(String title, bool isSelected) {
-    return Expanded(
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: isSelected ? Colors.black : Colors.transparent,
-              width: 2,
+  Widget _buildStoryItem(int index) {
+    final bool isLive = index == 1; // Example: second story is live
+
+    return Container(
+      width: 70,
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      child: Column(
+        children: [
+          Stack(
+            children: [
+              Container(
+                width: 70,
+                height: 70,
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.purple,
+                      Colors.orange,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: NetworkImage('https://picsum.photos/200/200?random=$index'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+              if (isLive)
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text(
+                      'LIVE',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 8,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'User ${index + 1}',
+            style: const TextStyle(
+              fontSize: 12,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        child: Text(
-          title,
-          style: TextStyle(
-            color: isSelected ? Colors.black : Colors.grey,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          ),
-          textAlign: TextAlign.center,
-        ),
+        ],
       ),
     );
   }
 
-  Widget _buildFeedList() {
-    return ListView.builder(
-      itemCount: 10,
-      itemBuilder: (context, index) {
-        return _buildPostCard(index);
-      },
-    );
-  }
-
-  Widget _buildPostCard(int index) {
+  Widget _buildPost(BuildContext context, int index) {
     return Card(
-      elevation: 0,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 4,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(
-                'https://picsum.photos/200?random=$index',
-              ),
+          _buildPostHeader(context, index),
+          _buildPostImage(index),
+          _buildPostActions(context),
+          _buildPostLikes(context),
+          _buildPostCaption(context, index),
+          _buildPostComments(context),
+          _buildPostTimestamp(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPostHeader(BuildContext context, int index) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundImage: NetworkImage(
+          'https://picsum.photos/50/50?random=${index + 10}',
+        ),
+      ),
+      title: Text(
+        'User ${index + 1}',
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      subtitle: const Text('Location'),
+      trailing: IconButton(
+        icon: const Icon(Icons.more_vert),
+        onPressed: () {
+          // Show post options
+        },
+      ),
+    );
+  }
+
+  Widget _buildPostImage(int index) {
+    return AspectRatio(
+      aspectRatio: 1,
+      child: Image.network(
+        'https://picsum.photos/500/500?random=$index',
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Center(
+            child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded /
+                      loadingProgress.expectedTotalBytes!
+                  : null,
             ),
-            title: Row(
-              children: [
-                Text(
-                  'User $index',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Icon(
-                  Icons.verified,
-                  size: 16,
-                  color: Colors.blue[600],
-                ),
-              ],
-            ),
-            subtitle: const Text('1 min ago'),
-            trailing: IconButton(
-              icon: const Icon(Icons.more_horiz),
-              onPressed: () {},
-            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildPostActions(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.favorite_border),
+            onPressed: () {},
           ),
-          Image.network(
-            'https://picsum.photos/400/300?random=$index',
-            fit: BoxFit.cover,
-            width: double.infinity,
+          IconButton(
+            icon: const Icon(Icons.chat_bubble_outline),
+            onPressed: () {},
           ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.favorite_border),
-                      onPressed: () {},
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.chat_bubble_outline),
-                      onPressed: () {},
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.share_outlined),
-                      onPressed: () {},
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      icon: const Icon(Icons.bookmark_border),
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '349 likes',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'When life gives you limes, arrange them in a zesty flatlay and create a lime-light masterpiece! 🍋✨',
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'View all 760 comments',
-                        style: TextStyle(
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: () {},
+          ),
+          const Spacer(),
+          IconButton(
+            icon: const Icon(Icons.bookmark_border),
+            onPressed: () {},
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPostLikes(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Text(
+        '${Random().nextInt(1000)} likes',
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPostCaption(BuildContext context, int index) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+        vertical: 8.0,
+      ),
+      child: RichText(
+        text: TextSpan(
+          style: DefaultTextStyle.of(context).style,
+          children: [
+            TextSpan(
+              text: 'User ${index + 1} ',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const TextSpan(
+              text: 'Beautiful day with my horse! 🐎 #HorseLife #Riding #Nature',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPostComments(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextButton(
+            onPressed: () {},
+            child: Text(
+              'View all ${Random().nextInt(50)} comments',
+              style: TextStyle(
+                color: Colors.grey[600],
+              ),
+            ),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Add a comment...',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.sentiment_satisfied_alt_outlined),
+                onPressed: () {},
+                iconSize: 20,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPostTimestamp() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Text(
+        '${Random().nextInt(23)} hours ago',
+        style: const TextStyle(
+          color: Colors.grey,
+          fontSize: 12,
+        ),
       ),
     );
   }
