@@ -20,6 +20,8 @@ dependencies:
   just_audio: ^0.9.36
   path_provider: ^2.1.2
   google_fonts: ^6.1.0
+  share_plus: ^7.2.1
+  url_launcher: ^6.2.4
 
   # Note: photo_filters package doesn't exist in pub.dev
   # We'll implement filters manually using ColorFilter
