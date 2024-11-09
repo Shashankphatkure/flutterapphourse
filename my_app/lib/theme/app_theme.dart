@@ -1,232 +1,116 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class AppTheme {
-  static const Color primaryColor = Color(0xFF2E7D32); // Dark Green
-  static const Color glassWhite = Color(0xFFFFFFFF);
-  static const Color glassStroke = Color(0x1AFFFFFF);
-  static const Color glassShadow = Color(0x3A000000);
-
-  static final ThemeData lightTheme = ThemeData(
+  // Brand Colors
+  static const Color primary = Color(0xFF7ED957);
+  static const Color secondary = Color(0xFF2D2D2D);
+  static const Color background = Colors.white;
+  static const Color surface = Colors.white;
+  
+  // Text Colors
+  static const Color textPrimary = Color(0xFF2D2D2D);
+  static const Color textSecondary = Color(0xFF757575);
+  
+  // Border Colors
+  static const Color border = Color(0xFFE0E0E0);
+  
+  static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: primaryColor,
-      primary: primaryColor,
-      secondary: const Color(0xFF66BB6A),
-      tertiary: const Color(0xFF81C784),
-      surface: glassWhite.withOpacity(0.8),
-      background: Colors.grey[100]!,
+    colorScheme: ColorScheme.light(
+      primary: primary,
+      secondary: secondary,
+      background: background,
+      surface: surface,
     ),
     
-    // Glassmorphism App Bar
-    appBarTheme: AppBarTheme(
-      systemOverlayStyle: SystemUiOverlayStyle.dark,
-      backgroundColor: glassWhite.withOpacity(0.8),
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      centerTitle: true,
-      titleTextStyle: const TextStyle(
-        color: Colors.black87,
-        fontSize: 20,
+    // Typography
+    textTheme: const TextTheme(
+      displayLarge: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.w400,
+        color: textPrimary,
+      ),
+      titleLarge: TextStyle(
+        fontSize: 18,
         fontWeight: FontWeight.w600,
+        color: textPrimary,
       ),
-      iconTheme: const IconThemeData(color: Colors.black87),
+      bodyLarge: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        color: textPrimary,
+      ),
     ),
-
-    // Scaffold Background
-    scaffoldBackgroundColor: Colors.grey[100],
-
-    // Glassmorphism Card
-    cardTheme: CardTheme(
+    
+    // AppBar Theme
+    appBarTheme: const AppBarTheme(
+      backgroundColor: background,
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: glassStroke.withOpacity(0.1)),
-      ),
-      color: glassWhite.withOpacity(0.7),
-      surfaceTintColor: Colors.transparent,
-      shadowColor: glassShadow.withOpacity(0.1),
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    ),
-
-    // Floating Action Button with Glass Effect
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: glassWhite.withOpacity(0.9),
-      foregroundColor: primaryColor,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: glassStroke.withOpacity(0.2)),
+      iconTheme: IconThemeData(color: textPrimary),
+      titleTextStyle: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.w400,
+        color: textPrimary,
       ),
     ),
-
-    // Elevated Button with Glass Effect
+    
+    // Button Themes
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: glassWhite.withOpacity(0.8),
-        foregroundColor: primaryColor,
-        elevation: 0,
-        shadowColor: Colors.transparent,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        backgroundColor: primary,
+        foregroundColor: textPrimary,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: glassStroke.withOpacity(0.2)),
+          borderRadius: BorderRadius.circular(25),
         ),
+        padding: const EdgeInsets.symmetric(vertical: 12),
       ),
     ),
-
-    // Outlined Button with Glass Effect
+    
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        foregroundColor: primaryColor,
-        backgroundColor: glassWhite.withOpacity(0.5),
-        side: BorderSide(color: primaryColor.withOpacity(0.2)),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        foregroundColor: primary,
+        side: const BorderSide(color: primary),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(25),
         ),
+        padding: const EdgeInsets.symmetric(vertical: 12),
       ),
     ),
-
-    // Text Button with Glass Effect
-    textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(
-        foregroundColor: primaryColor,
-        backgroundColor: Colors.transparent,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      ),
-    ),
-
-    // Input Decoration with Glass Effect
+    
+    // Input Decoration Theme
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: glassWhite.withOpacity(0.7),
+      fillColor: surface,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: glassStroke.withOpacity(0.2)),
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: border),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: glassStroke.withOpacity(0.1)),
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: border),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: primaryColor.withOpacity(0.5)),
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: primary),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      prefixIconColor: primaryColor.withOpacity(0.7),
-      suffixIconColor: primaryColor.withOpacity(0.7),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 12,
+      ),
     ),
-
-    // Bottom Navigation Bar with Glass Effect
-    bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      backgroundColor: glassWhite.withOpacity(0.8),
-      selectedItemColor: primaryColor,
-      unselectedItemColor: Colors.grey[600],
-      type: BottomNavigationBarType.fixed,
-      elevation: 0,
-      landscapeLayout: BottomNavigationBarLandscapeLayout.centered,
-    ),
-
-    // Tab Bar with Glass Effect
-    tabBarTheme: TabBarTheme(
-      labelColor: primaryColor,
-      unselectedLabelColor: Colors.grey[600],
-      indicatorColor: primaryColor,
-      indicatorSize: TabBarIndicatorSize.label,
-      dividerColor: Colors.transparent,
-    ),
-
-    // Chip Theme with Glass Effect
+    
+    // Chip Theme
     chipTheme: ChipThemeData(
-      backgroundColor: glassWhite.withOpacity(0.7),
-      selectedColor: primaryColor.withOpacity(0.2),
-      labelStyle: TextStyle(color: primaryColor),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      backgroundColor: surface,
+      selectedColor: primary.withOpacity(0.1),
+      side: const BorderSide(color: border),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
-        side: BorderSide(color: glassStroke.withOpacity(0.2)),
       ),
-    ),
-
-    // Dialog Theme with Glass Effect
-    dialogTheme: DialogTheme(
-      backgroundColor: glassWhite.withOpacity(0.9),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: glassStroke.withOpacity(0.2)),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 12,
       ),
-    ),
-
-    // Bottom Sheet Theme with Glass Effect
-    bottomSheetTheme: BottomSheetThemeData(
-      backgroundColor: glassWhite.withOpacity(0.9),
-      elevation: 0,
-      modalElevation: 0,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-    ),
-
-    // Divider Theme
-    dividerTheme: DividerThemeData(
-      color: glassStroke.withOpacity(0.1),
-      thickness: 1,
-      space: 1,
-    ),
-
-    // List Tile Theme with Glass Effect
-    listTileTheme: ListTileThemeData(
-      tileColor: Colors.transparent,
-      selectedTileColor: primaryColor.withOpacity(0.1),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-    ),
-
-    // Popup Menu Theme with Glass Effect
-    popupMenuTheme: PopupMenuThemeData(
-      color: glassWhite.withOpacity(0.9),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: glassStroke.withOpacity(0.2)),
-      ),
-    ),
-
-    // Snack Bar Theme with Glass Effect
-    snackBarTheme: SnackBarThemeData(
-      backgroundColor: glassWhite.withOpacity(0.9),
-      contentTextStyle: const TextStyle(color: Colors.black87),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: glassStroke.withOpacity(0.2)),
-      ),
-      behavior: SnackBarBehavior.floating,
     ),
   );
-
-  // Helper method to create glass effect container
-  static BoxDecoration glassDecoration({
-    double opacity = 0.7,
-    double borderOpacity = 0.2,
-    double radius = 16,
-  }) {
-    return BoxDecoration(
-      color: glassWhite.withOpacity(opacity),
-      borderRadius: BorderRadius.circular(radius),
-      border: Border.all(
-        color: glassStroke.withOpacity(borderOpacity),
-        width: 1,
-      ),
-      boxShadow: [
-        BoxShadow(
-          color: glassShadow.withOpacity(0.1),
-          blurRadius: 10,
-          spreadRadius: 0,
-        ),
-      ],
-    );
-  }
 } 

@@ -14,401 +14,185 @@ class EditHorseScreen extends StatefulWidget {
 
 class _EditHorseScreenState extends State<EditHorseScreen> {
   final _formKey = GlobalKey<FormState>();
-  String? _selectedBreed;
-  String? _selectedGender;
-  String? _selectedColor;
-  DateTime? _birthDate;
-  bool _isShowHorse = false;
-  final List<String> _disciplines = [];
-
-  final List<String> _breeds = [
-    'Arabian',
-    'Thoroughbred',
-    'Quarter Horse',
-    'Warmblood',
-    'Friesian',
-    'Andalusian',
-    'Morgan',
-    'Paint Horse',
-    'Appaloosa',
-  ];
-
-  final List<String> _colors = [
-    'Bay',
-    'Chestnut',
-    'Black',
-    'Grey',
-    'Palomino',
-    'Buckskin',
-    'Roan',
-    'Pinto',
-  ];
-
-  final List<String> _availableDisciplines = [
-    'Dressage',
-    'Show Jumping',
-    'Eventing',
-    'Western Pleasure',
-    'Trail Riding',
-    'Reining',
-    'Endurance',
-  ];
-
+  String _selectedGender = 'Stallion';
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isEditing ? 'Edit Horse' : 'Add New Horse'),
-        actions: [
-          TextButton.icon(
-            onPressed: _saveHorse,
-            icon: const Icon(Icons.check),
-            label: const Text('Save'),
-          ),
-        ],
+        title: Text('Horse Details'),
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: Form(
         key: _formKey,
         child: ListView(
           padding: const EdgeInsets.all(16.0),
           children: [
-            _buildImageSection(),
+            Text(
+              'Basic Information',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildImageUpload(),
+            const SizedBox(height: 16),
+            _buildTextField('Name'),
+            const SizedBox(height: 12),
+            _buildTextField('Registered Name'),
+            const SizedBox(height: 12),
+            _buildTextField('Age'),
+            const SizedBox(height: 12),
+            _buildTextField('Breed'),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(child: _buildTextField('Colour')),
+                const SizedBox(width: 12),
+                Expanded(child: _buildTextField('Height')),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Gender',
+              style: TextStyle(color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 8),
+            _buildGenderSelector(),
             const SizedBox(height: 24),
-            _buildBasicInfoSection(),
+            Text(
+              'Identification Details (Optional)',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildTextField('Describe unique features, markings, et...', maxLines: 3),
+            const SizedBox(height: 12),
+            _buildTextField('Passport Issuer'),
+            const SizedBox(height: 12),
+            _buildTextField('Passport Number'),
+            const SizedBox(height: 12),
+            _buildTextField('UELN (Life Number)'),
             const SizedBox(height: 24),
-            _buildPhysicalDetailsSection(),
-            const SizedBox(height: 24),
-            _buildShowDetailsSection(),
-            const SizedBox(height: 24),
-            _buildHealthSection(),
           ],
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ElevatedButton(
+          onPressed: _saveHorse,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF7ED957),
+            foregroundColor: Colors.black,
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: Text('Add [horse]'),
         ),
       ),
     );
   }
 
-  Widget _buildImageSection() {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Container(
-          height: 200,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceVariant,
-            borderRadius: BorderRadius.circular(12),
-            image: const DecorationImage(
-              image: NetworkImage('https://picsum.photos/400/200'),
-              fit: BoxFit.cover,
+  Widget _buildImageUpload() {
+    return Center(
+      child: Stack(
+        children: [
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.grey[200],
+            ),
+            child: const Center(
+              child: Icon(
+                Icons.camera_alt,
+                size: 40,
+                color: Colors.grey,
+              ),
             ),
           ),
-        ),
-        Positioned(
-          bottom: 16,
-          right: 16,
-          child: Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                child: IconButton(
-                  icon: const Icon(Icons.camera_alt, color: Colors.white),
-                  onPressed: _pickImage,
-                ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(
+                color: Color(0xFF7ED957),
+                shape: BoxShape.circle,
               ),
-              const SizedBox(width: 8),
-              CircleAvatar(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                child: IconButton(
-                  icon: const Icon(Icons.photo_library, color: Colors.white),
-                  onPressed: _pickImage,
-                ),
+              child: const Icon(
+                Icons.add,
+                size: 20,
+                color: Colors.white,
               ),
-            ],
+            ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField(String label, {int maxLines = 1}) {
+    return TextFormField(
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        labelText: label,
+        floatingLabelBehavior: FloatingLabelBehavior.never,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey[300]!),
         ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      ),
+    );
+  }
+
+  Widget _buildGenderSelector() {
+    return Wrap(
+      spacing: 8,
+      children: [
+        _buildGenderChip('Stallion'),
+        _buildGenderChip('Mare'),
+        _buildGenderChip('Gelding'),
+        _buildGenderChip('Filly'),
+        _buildGenderChip('Colt'),
       ],
     );
   }
 
-  Widget _buildBasicInfoSection() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Basic Information',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Horse Name',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.pets),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a name';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedBreed,
-                    decoration: const InputDecoration(
-                      labelText: 'Breed',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.category),
-                    ),
-                    items: _breeds.map((breed) {
-                      return DropdownMenuItem(
-                        value: breed,
-                        child: Text(breed),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedBreed = value;
-                      });
-                    },
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            InkWell(
-              onTap: _pickBirthDate,
-              child: InputDecorator(
-                decoration: const InputDecoration(
-                  labelText: 'Birth Date',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.calendar_today),
-                ),
-                child: Text(
-                  _birthDate != null
-                      ? '${_birthDate!.day}/${_birthDate!.month}/${_birthDate!.year}'
-                      : 'Select Date',
-                ),
-              ),
-            ),
-          ],
-        ),
+  Widget _buildGenderChip(String gender) {
+    final isSelected = _selectedGender == gender;
+    return FilterChip(
+      label: Text(gender),
+      selected: isSelected,
+      onSelected: (bool selected) {
+        setState(() {
+          _selectedGender = gender;
+        });
+      },
+      backgroundColor: Colors.white,
+      selectedColor: const Color(0xFFE8F7E5),
+      checkmarkColor: const Color(0xFF7ED957),
+      side: BorderSide(
+        color: isSelected ? const Color(0xFF7ED957) : Colors.grey[300]!,
       ),
-    );
-  }
-
-  Widget _buildPhysicalDetailsSection() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Physical Details',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedGender,
-                    decoration: const InputDecoration(
-                      labelText: 'Gender',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: const [
-                      DropdownMenuItem(value: 'Stallion', child: Text('Stallion')),
-                      DropdownMenuItem(value: 'Mare', child: Text('Mare')),
-                      DropdownMenuItem(value: 'Gelding', child: Text('Gelding')),
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedGender = value;
-                      });
-                    },
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: _selectedColor,
-                    decoration: const InputDecoration(
-                      labelText: 'Color',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: _colors.map((color) {
-                      return DropdownMenuItem(
-                        value: color,
-                        child: Text(color),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedColor = value;
-                      });
-                    },
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Height (hands)',
-                      border: OutlineInputBorder(),
-                      suffixText: 'hh',
-                    ),
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: 'Weight (lbs)',
-                      border: OutlineInputBorder(),
-                      suffixText: 'lbs',
-                    ),
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
       ),
-    );
-  }
-
-  Widget _buildShowDetailsSection() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Show Details',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                Switch(
-                  value: _isShowHorse,
-                  onChanged: (value) {
-                    setState(() {
-                      _isShowHorse = value;
-                    });
-                  },
-                ),
-              ],
-            ),
-            if (_isShowHorse) ...[
-              const SizedBox(height: 16),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Registration Number',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.numbers),
-                ),
-              ),
-              const SizedBox(height: 16),
-              _buildDisciplineSelector(),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHealthSection() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Health Information',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Medical Notes',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.medical_services),
-              ),
-              maxLines: 3,
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Diet Requirements',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.restaurant_menu),
-              ),
-              maxLines: 2,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _pickBirthDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _birthDate ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) {
-      setState(() {
-        _birthDate = picked;
-      });
-    }
-  }
-
-  Future<void> _pickImage() async {
-    // TODO: Implement image picker
-    // Use image_picker package
-  }
-
-  Widget _buildDisciplineSelector() {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: _availableDisciplines.map((discipline) {
-        final isSelected = _disciplines.contains(discipline);
-        return FilterChip(
-          label: Text(discipline),
-          selected: isSelected,
-          onSelected: (selected) {
-            setState(() {
-              if (selected) {
-                _disciplines.add(discipline);
-              } else {
-                _disciplines.remove(discipline);
-              }
-            });
-          },
-          selectedColor: Theme.of(context).colorScheme.primaryContainer,
-          checkmarkColor: Theme.of(context).colorScheme.primary,
-        );
-      }).toList(),
     );
   }
 

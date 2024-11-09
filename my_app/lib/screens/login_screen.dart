@@ -72,9 +72,10 @@ class _LoginScreenState extends State<LoginScreen> {
             onPressed: () {
               // TODO: Implement Google sign in
             },
-            icon: Image.network(
-              'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg',
-              height: 20,
+            icon: Icon(
+              Icons.g_mobiledata,
+              size: 24,
+              color: Colors.grey[700],
             ),
             label: const Text('Google'),
             style: OutlinedButton.styleFrom(
