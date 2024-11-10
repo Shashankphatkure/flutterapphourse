@@ -36,3 +36,6 @@ flutter:
 
   assets:
     - assets/images/
+
+dependency_overrides:
+  win32: ^5.8.0
